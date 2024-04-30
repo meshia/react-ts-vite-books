@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { styled } from 'styled-components';
+import BookItem from './BookItem';
 import { BookItemType } from './BookListTypes';
+
+const StyledList = styled.ul`
+    display: flex;
+    flex-flow: row wrap;
+`
 
 const baseUrl = `https://openlibrary.org`;
 
@@ -27,11 +34,11 @@ const BookList: React.FC = () => {
     return (
         <div className='book-list'>
             <h2>Book List</h2>
-            <ul>
+            <StyledList>
                 {books.map(book =>(
-                    <li key={ book.key }>{ book.title }</li>
+                    <BookItem key={ book.key } book={ book }/>
                 ))}
-            </ul>
+            </StyledList>
             <button onClick={() => fetchBooks()}>
                 next 
             </button>

@@ -10,6 +10,10 @@ export interface BookItemType  {
     subtitle?: string,
   }
 
+export interface BookItemProps {
+    book: BookItemType
+}
+
   export interface LinkType {
     title: string,
     url: URL
