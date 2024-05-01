@@ -13,35 +13,51 @@ const baseUrl = `https://openlibrary.org`;
 
 const BookList: React.FC = () => {
     const [books, setBooks] = useState<BookItemType[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
     const [nextUrl, setNextUrl] = useState<string>(`${baseUrl}/authors/OL1394865A/works.json`);
-    // const [pevUrl, setPrevUrl] = useState<string | null>(null);
+    const [pevUrl, setPrevUrl] = useState<string>('');
 
     useEffect(() => {
-        fetchBooks();
+        fetchBooks(nextUrl);
     },[]);
 
-    const fetchBooks = () => {
-        axios.get(nextUrl).then((response) => {
+    const fetchBooks = async(currUrl:string) => {
+        setLoading(true);
+        try {
+            const response = await axios.get(currUrl);
             setBooks(response.data.entries);
             if(response.data.links.next) setNextUrl(`${baseUrl}${response.data.links.next}`);
-            // if(response.data.links.prev) setPrevUrl(`${baseUrl}${response.data.links.prev}`);
-            console.log(response.data);
-        }).catch((error) => {
-            console.error('Error fetching books:', error);
-        });
+            else setNextUrl('');
+            if(response.data.links.prev) setPrevUrl(`${baseUrl}${response.data.links.prev}`)
+            else setPrevUrl('');
+            setLoading(false);
+        } catch (err) {
+            console.error('Error fetching books:', err);
+            setLoading(false);
+        }
     }
 
     return (
         <div className='book-list'>
             <h2>Book List</h2>
-            <StyledList>
-                {books.map(book =>(
-                    <BookItem key={ book.key } book={ book }/>
-                ))}
-            </StyledList>
-            <button onClick={() => fetchBooks()}>
-                next 
-            </button>
+            { loading ? (
+                <p>Loading...</p>
+            ) : (
+                <>
+                <StyledList>
+                    { books.map(book =>(
+                        <BookItem key={ book.key } book={ book }/>
+                    )) }
+                </StyledList>
+                { pevUrl && <button onClick={() => fetchBooks(pevUrl)}>
+                    prev 
+                </button>}
+                { nextUrl && <button onClick={() => fetchBooks(nextUrl)}>
+                    next 
+                </button>
+                }
+                </>
+            )}
         </div>
     )
 }
